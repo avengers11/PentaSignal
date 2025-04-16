@@ -1,0 +1,290 @@
+[16-Apr-2025 04:57:31 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:31 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:31 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 04:57:50 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:50 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:50 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 04:57:59 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:59 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:57:59 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 04:59:57 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:59:57 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 04:59:57 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:02:38 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:02:38 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:02:38 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:02:41 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:02:41 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:02:41 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:03:21 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:03:21 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:03:21 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:05:32 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:05:32 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:05:32 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:06:02 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:06:02 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:06:02 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[16-Apr-2025 05:06:14 UTC] PHP Warning:  include(/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php): Failed to open stream: No such file or directory in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:06:14 UTC] PHP Warning:  include(): Failed opening '/home/pentaforce/email-campaign.pentaforce.app/vendor/composer/../../app/Console/Kernel.php' for inclusion (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home/pentaforce/email-campaign.pentaforce.app/vendor/composer/ClassLoader.php on line 576
+[16-Apr-2025 05:06:14 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "App\Console\Kernel" does not exist in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:912
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(912): ReflectionClass->__construct('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#9 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#10 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [App\Console\Kernel] does not exist. in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php:914
+Stack trace:
+#0 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build('App\\Console\\Ker...')
+#1 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('App\\Console\\Ker...', Array, false)
+#2 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(296): Illuminate\Foundation\Application->resolve('App\\Console\\Ker...', Array, false)
+#3 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(908): Illuminate\Container\Container->Illuminate\Container\{closure}(Object(Illuminate\Foundation\Application), Array)
+#4 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(795): Illuminate\Container\Container->build(Object(Closure))
+#5 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(986): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#6 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php(731): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#7 /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(971): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
+#9 {main}
+  thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
