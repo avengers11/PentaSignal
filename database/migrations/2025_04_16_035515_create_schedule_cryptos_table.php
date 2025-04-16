@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('chat_id')->nullable();
             $table->string('instruments')->nullable();
             $table->string('tp_mode')->nullable();
+            $table->string('market')->nullable();
             $table->string('entry_target')->nullable();
             $table->string('stop_loss')->nullable();
             $table->string('take_profit1')->nullable();

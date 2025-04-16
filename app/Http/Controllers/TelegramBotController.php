@@ -7,8 +7,8 @@ use App\Models\TelegramUser;
 use WeStacks\TeleBot\TeleBot;
 use App\Models\ScheduleCrypto;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
+use Telegram\Bot\Keyboard\Keyboard;
 
 
 class TelegramBotController extends Controller
@@ -18,7 +18,7 @@ class TelegramBotController extends Controller
     //+++++++++++++++++++++++++++++++++++++++
     public function __construct()
     {
-        $this->bot = new TeleBot('7945852118:AAFqALUqMQ4qAy_kRGt8kAUpjKA8CrVEbLs');
+        $this->bot = new TeleBot(env('TELEGRAM_BOT_HTTP'));
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public function index()
@@ -29,6 +29,39 @@ class TelegramBotController extends Controller
     public function telegram_webhook(Request $request)
     {
         $data = $request->all();
+        
+        \Log::info($data);
+        // ✅ Handle button click (callback_query)
+        if (isset($data['callback_query'])) {
+            $callbackData = $data['callback_query']['data'];
+            $chatId = $data['callback_query']['message']['chat']['id'];
+            $messageId = $data['callback_query']['message']['message_id'];
+
+            if (str_starts_with($callbackData, 'cancel_trade_')) {
+                $scheduleId = str_replace('cancel_trade_', '', $callbackData);
+
+                // Cancel the trade
+                ScheduleCrypto::where('id', $scheduleId)->update(['status' => 'cancelled']);
+
+                // Respond to button press to remove the "loading" spinner
+                $this->bot->answerCallbackQuery([
+                    'callback_query_id' => $data['callback_query']['id'],
+                    'text' => '✅ Trade cancelled!',
+                    'show_alert' => false,
+                ]);
+
+                // Optional: Edit the message to reflect cancellation
+                $this->bot->editMessageText([
+                    'chat_id' => $chatId,
+                    'message_id' => $messageId,
+                    'text' => '🚫 Trade has been cancelled.',
+                    'parse_mode' => 'HTML',
+                ]);
+            }
+
+            return response('ok');
+        }
+
         if (!isset($data['message'])) {
             return response('ok');
         }
@@ -36,6 +69,8 @@ class TelegramBotController extends Controller
         $chatId = $data['message']['chat']['id'];
         $text = trim($data['message']['text'] ?? '');
         $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
+
+       
 
 
         if ($text === '/start') {
@@ -52,6 +87,72 @@ class TelegramBotController extends Controller
             ]);
             $user->state = null;
 
+        }elseif ($text === '/list') {
+            $schedules = ScheduleCrypto::latest()
+            ->where("chat_id", $chatId)
+            ->where("status", "running")
+            ->get();
+        
+            $messages = [];
+            
+            foreach ($schedules as $value) {
+                $messages[] = <<<EOT
+                <b>📊 Coin:</b> <code>{$value->instruments}</code>
+                <b>📈 Type:</b> {$value->tp_mode}
+                <b>🎯 Entry:</b> <code>{$value->entry_target}</code>
+                <b>🛑 SL:</b> <code>{$value->stop_loss}</code>
+                ───────────────
+                EOT;
+            }
+            
+            // Join all messages into one
+            $finalMessage = implode("\n\n", $messages);
+            
+            // Send it via Telegram bot with HTML formatting
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => $finalMessage,
+                'parse_mode' => 'HTML',
+            ]);
+            
+            $user->state = null;
+
+        }elseif ($text === '/cancel') {
+            $schedules = ScheduleCrypto::latest()
+            ->where("chat_id", $chatId)
+            ->where("status", "running")
+            ->get();
+        
+            $messages = [];
+            foreach ($schedules as $value) {
+                $messages[] = [
+                    'text' => <<<EOT
+                    <b>📊 Coin:</b> <code>{$value->instruments}</code>
+                    <b>📈 Type:</b> {$value->tp_mode}
+                    <b>🎯 Entry:</b> <code>{$value->entry_target}</code>
+                    <b>🛑 SL:</b> <code>{$value->stop_loss}</code>
+                    EOT,
+                    'reply_markup' => Keyboard::make([
+                        'inline_keyboard' => [
+                            [
+                                ['text' => '❌ Cancel Trade', 'callback_data' => "cancel_trade_{$value->id}"]
+                            ]
+                        ]
+                    ]),
+                ];
+            }
+            
+            foreach ($messages as $message) {
+                $this->bot->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $message['text'],
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => $message['reply_markup'],
+                ]);
+            }
+            
+            $user->state = null;
+
         }else { 
             // 🧹 Clean input
             $text = preg_replace('/[^\x20-\x7E]/', '', $text); // remove emojis
@@ -64,6 +165,10 @@ class TelegramBotController extends Controller
                 $base = strtoupper($matches[1]);
                 $quote = strtoupper($matches[2]);
                 $coinType = "$base-$quote";
+
+                // market
+                preg_match('/Exchange:\s*\$?([\d\.]+)/i', $text, $exchangeMatch);
+                $market = strtolower($exchangeMatch[1]) ?? null;
 
                 // 🔍 Trade mode
                 preg_match('/\b(SHORT|LONG)\b/i', $text, $modeMatch);
@@ -96,7 +201,7 @@ class TelegramBotController extends Controller
                 ]);
 
                 // 📈 Price fetching
-                $bybitInfo = $this->bybitInfo($coinType);
+                $bybitInfo = bybitInfo($coinType, $market);
                 if ($bybitInfo["status"]) {
                     $price = $bybitInfo['price'];
                     $this->bot->sendMessage([
@@ -109,6 +214,7 @@ class TelegramBotController extends Controller
                     $crypto->chat_id = $chatId;
                     $crypto->instruments = $coinType;
                     $crypto->entry_target = $entryTarget;
+                    $crypto->market = $market;
                     $crypto->tp_mode = $tpMode;
                     $crypto->stop_loss = $stopLoss;
                     $crypto->take_profit1 = $tp1;
@@ -322,32 +428,38 @@ class TelegramBotController extends Controller
         return Response::json($message);
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function bybitInfo($instruments)
-    {
-        // https://developers.coindesk.com/settings/api-keys
-        $response = Http::get('https://data-api.coindesk.com/spot/v1/latest/tick', [
-            'market' => 'bybit',
-            'instruments' => $instruments, //'LTC-USDT',
-            "apply_mapping" => true,
-            "api_key" => "c37c91234bb89ea9a136491e17c522f2cdf21d83a483ac3d897641cfd3b8f3f3"
-        ]);
-        Log::info($response);
-    
-        if ($response->successful()) {
-            $data = $response->json();
-            if(isset($data["Data"][$instruments]["PRICE"])){
-                $price = $data["Data"][$instruments]["PRICE"];
-                return ["price" => $price, "status" => true];
-            }else{
-                return ["msg" => "Something went wrong, try again!", "status" => false];
-            }
-        } else {
-            return ["msg" => $response["Err"]["message"], "status" => false];
-        }
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public function aiShedule($text)
     {
 
     }
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    public function handleCallbackQuery($update)
+    {
+        $callback = $update->getCallbackQuery();
+        $data = $callback->getData(); // e.g., "cancel_trade_12"
+
+        if (\Illuminate\Support\Str::startsWith($data, 'cancel_trade_')) {
+            $tradeId = str_replace('cancel_trade_', '', $data);
+
+            // Cancel the trade in your backend
+            $trade = ScheduleCrypto::find($tradeId);
+            if ($trade && $trade->status === 'running') {
+                $trade->status = 'cancelled';
+                $trade->save();
+
+                $this->bot->answerCallbackQuery([
+                    'callback_query_id' => $callback->getId(),
+                    'text' => "✅ Trade for {$trade->instruments} has been cancelled.",
+                    'show_alert' => false
+                ]);
+            } else {
+                $this->bot->answerCallbackQuery([
+                    'callback_query_id' => $callback->getId(),
+                    'text' => "⚠️ Trade already cancelled or not found.",
+                    'show_alert' => true
+                ]);
+            }
+        }
+    }
+
 }
