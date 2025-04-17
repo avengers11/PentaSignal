@@ -7,9 +7,9 @@ use App\Models\TelegramUser;
 use WeStacks\TeleBot\TeleBot;
 use App\Models\ScheduleCrypto;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
 use Telegram\Bot\Keyboard\Keyboard;
-
+use Illuminate\Support\Facades\Response;
+use WeStacks\TeleBot\Objects\ReplyKeyboardMarkup;
 
 class TelegramBotController extends Controller
 {
@@ -29,14 +29,37 @@ class TelegramBotController extends Controller
     public function telegram_webhook(Request $request)
     {
         $data = $request->all();
+
+        $chatId = $data['message']['chat']['id'];
+
+
+
+        $keyboard = [
+            ['7', '8', '9'],
+            ['4', '5', '6'],
+            ['1', '2', '3'],
+            ['0']
+        ];
         
-        \Log::info($data);
+        $this->bot->sendMessage([
+              'chat_id' => $chatId,
+              'text' => 'Hello World',
+              'reply_markup' => json_encode([
+                  'keyboard' => $keyboard,
+                  'resize_keyboard' => true,
+                  'one_time_keyboard' => true
+              ])
+          ]);
+
+        return ;
+        
         // ✅ Handle button click (callback_query)
         if (isset($data['callback_query'])) {
             $callbackData = $data['callback_query']['data'];
             $chatId = $data['callback_query']['message']['chat']['id'];
             $messageId = $data['callback_query']['message']['message_id'];
 
+            // camcel trade 
             if (str_starts_with($callbackData, 'cancel_trade_')) {
                 $scheduleId = str_replace('cancel_trade_', '', $callbackData);
 
@@ -59,6 +82,41 @@ class TelegramBotController extends Controller
                 ]);
             }
 
+            // home 
+            else if($callbackData == "main_menu"){
+                $this->telegramMessageType("main_menu", $chatId);
+            }
+
+            // help 
+            else if($callbackData == "help"){
+                $this->telegramMessageType("help", $chatId);
+            }
+
+            // real trade  
+            else if($callbackData == "real_trade"){
+                $this->telegramMessageType("real_trade", $chatId);
+            }
+
+            // take partial profits
+            else if($callbackData == "take_partial_profits"){
+                $this->telegramMessageType("take_partial_profits", $chatId);
+            }
+
+            // close specific tp
+            else if($callbackData == "close_specific_tp"){
+                $this->telegramMessageType("close_specific_tp", $chatId);
+            }
+
+            // equal each tp
+            else if($callbackData == "equal_each_tp"){
+                $this->telegramMessageType("equal_each_tp", $chatId);
+            }
+
+            // custom_setup
+            else if($callbackData == "custom_setup"){
+                $this->telegramMessageType("custom_setup", $chatId);
+            }
+
             return response('ok');
         }
 
@@ -70,16 +128,9 @@ class TelegramBotController extends Controller
         $text = trim($data['message']['text'] ?? '');
         $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
 
-       
-
-
         if ($text === '/start') {
-            $this->bot->sendMessage([
-                'chat_id' => $chatId,
-                'text' => "👋 Welcome to the bot! Use /help or /api_token to proceed.",
-            ]);
+            $this->telegramMessageType("main_menu", $chatId);
             $user->state = null;
-
         } elseif ($text === '/help') {
             $this->bot->sendMessage([
                 'chat_id' => $chatId,
@@ -160,32 +211,39 @@ class TelegramBotController extends Controller
 
             // 🔍 Extract coin pair (e.g., BTC/USDT)
             preg_match('/\b([A-Z0-9]+)\/([A-Z]{3,5})\b/i', $text, $matches);
+            // marketplace 
+            preg_match('/Exchange:\s*([A-Za-z]+)/i', $text, $exchangeMatch);
+            // 🔍 Trade mode
+            preg_match('/\b(SHORT|LONG)\b/i', $text, $modeMatch);
+            // 💸 Entry Target
+            preg_match('/Entry Target:\s*\$?([\d\.]+)/i', $text, $entryMatch);
+            // 🛑 Stop Loss
+            preg_match('/SL:\s*\$?([\d\.]+)/i', $text, $slMatch);
+            // 🎯 TP1–TP6
+            preg_match_all('/\d\)\s*([\d\.]+)/', $text, $tpMatches);
 
-            if (isset($matches[1], $matches[2])) {
+            if (
+                isset($matches[1]) &&
+                isset($matches[2]) &&
+                isset($exchangeMatch[1]) &&
+                isset($modeMatch[1]) &&
+                isset($entryMatch[1]) &&
+                isset($slMatch[1])
+            ) {
                 $base = strtoupper($matches[1]);
                 $quote = strtoupper($matches[2]);
                 $coinType = "$base-$quote";
 
                 // market
-                preg_match('/Exchange:\s*\$?([\d\.]+)/i', $text, $exchangeMatch);
                 $market = strtolower($exchangeMatch[1]) ?? null;
-
                 // 🔍 Trade mode
-                preg_match('/\b(SHORT|LONG)\b/i', $text, $modeMatch);
                 $tpMode = strtoupper($modeMatch[1] ?? 'UNKNOWN');
-
                 // 💸 Entry Target
-                preg_match('/Entry Target:\s*\$?([\d\.]+)/i', $text, $entryMatch);
                 $entryTarget = $entryMatch[1] ?? null;
-
                 // 🛑 Stop Loss
-                preg_match('/SL:\s*\$?([\d\.]+)/i', $text, $slMatch);
                 $stopLoss = $slMatch[1] ?? null;
-
                 // 🎯 TP1–TP6
-                preg_match_all('/\d\)\s*([\d\.]+)/', $text, $tpMatches);
                 $tpPoints = $tpMatches[1] ?? [];
-
                 // Assign to individual variables safely
                 $tp1 = $tpPoints[0] ?? null;
                 $tp2 = $tpPoints[1] ?? null;
@@ -194,12 +252,60 @@ class TelegramBotController extends Controller
                 $tp5 = $tpPoints[4] ?? null;
                 $tp6 = $tpPoints[5] ?? null;
 
+                $this->bot->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "Your message content goes here",
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => [
+                        'keyboard' => [
+                            [
+                                ['text' => '🎯 TP1', 'callback_data' => 'close_specific_tp1'], // Regular keyboard button
+                            ]
+                        ],
+                        'resize_keyboard' => true,  // To resize the keyboard
+                        'one_time_keyboard' => true // To hide the keyboard after use
+                    ]
+                ]);
+
+                return ;
                 // ✅ Send detected data
                 $this->bot->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => "📊 Coin: $coinType\n📈 Type: $tpMode\n🎯 Entry: $entryTarget\n🛑 SL: $stopLoss\n🎯 TP1: $tp1\n🎯 TP2: $tp2\n🎯 TP3: $tp3\n🎯 TP4: $tp4\n🎯 TP5: $tp5\n🎯 TP6: $tp6\n⏳ Getting live price...",
+                    'text' => <<<EOT
+                    <b>📊 I've received your signal for $coinType</b>
+                
+                    <b>Type:</b> $tpMode  
+                    <b>Entry:</b> $entryTarget$  
+                    <b>Stop Loss:</b> $stopLoss$
+                    
+                    <b>Take Profit Levels:</b>  
+                    🎯TP1: $tp1$  
+                    🎯TP2: $tp2$  
+                    🎯TP3: $tp3$  
+                    🎯TP4: $tp4$  
+                    🎯TP5: $tp5$  
+                    🎯TP6: $tp6$
+                    
+                    Is this a real trade you're taking or just for tracking/demo purposes?
+                    EOT,
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => new ReplyKeyboardMarkup(
+                        [
+                            [
+                                ['text' => '🟢 Real Trade'],
+                                ['text' => '🧪 Demo Only']
+                            ]
+                        ], // keyboard
+                        true, // resize_keyboard
+                        true, // one_time_keyboard
+                        false, // selective
+                        null, // input_field_placeholder
+                        false // is_persistent
+                    )
                 ]);
 
+
+                return;
                 // 📈 Price fetching
                 $bybitInfo = bybitInfo($coinType, $market);
                 if ($bybitInfo["status"]) {
@@ -236,7 +342,30 @@ class TelegramBotController extends Controller
             } else {
                 $this->bot->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => "❌ Could not detect a valid coin pair. Please use format like BTC/USDT.",
+                    'text' => <<<EOT
+                    ⚠️ <b>Unrecognized Signal Format</b>
+                    I couldn't automatically parse this signal format.
+                    
+                    <b>If you're a premium user:</b>
+                    We'll add this signal format to our database soon. Please contact support to expedite this process.
+                    
+                    <b>If you're using demo mode:</b>
+                    Demo mode only supports <b>SignalVision</b> format signals. Please use a SignalVision signal or upgrade to premium for support of additional formats.
+                    EOT,
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => Keyboard::make([
+                        'inline_keyboard' => [
+                            [
+                                ['text' => '🔁 Try Another Signal', 'callback_data' => 'try_another_signal']
+                            ],
+                            [
+                                ['text' => '🚀 Upgrade to Premium', 'callback_data' => 'upgrade_premium']
+                            ],
+                            [
+                                ['text' => '🏠 Main Menu', 'callback_data' => 'main_menu']
+                            ]
+                        ]
+                    ])
                 ]);
             }
 
@@ -245,187 +374,282 @@ class TelegramBotController extends Controller
         $user->save();
         return response('ok');
     }
+    /*
+    TELEGRAM ALL MSG
+    */
+    private function telegramMessageType($type, $chatId)
+    {
+        if($type == "main_menu"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                ⚠️ <b>🚀 Welcome to SignalAlert! </b>
+                I'm your personal trading assistant that will track your signals and alert you when price targets are reached.
+                
+                <b>If you're a premium user:</b>
+                We'll add this signal format to our database soon. Please contact support to expedite this process.
 
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendMessage(Request $request)
-    {
-        try {
-            $message = $this->bot->sendMessage([
-                'chat_id'      => $this->chat_id,
-                'text'         => 'Welcome To Code-180 Youtube Channel',
-                'reply_markup' => [
-                    'inline_keyboard' => [[[
-                        'text' => '@code-180',
-                        'url'  => 'https://www.youtube.com/@code-180/videos',
-                    ]]],
-                ],
+                ⭐ You are currently in DEMO MODE and can track up to 3 signals for free.
+                
+                <b>To get started:</b>
+                1️⃣ Forward a trading signal from SignalVision or other signal providers
+                2️⃣ I'll set up alerts for your signal's entry points, stop loss, and take profit levels
+
+                ⚠️ Note: Demo mode supports SignalVision signals only. For other signal formats, a premium license is required.
+
+                Want unlimited signals and premium features?
+
+                Visit signalvision.com/pricing to get your subscription.
+
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '📡 Track Signal', 'callback_data' => 'try_another_signal'],
+                            ['text' => '📋 My Signals', 'callback_data' => 'upgrade_premium']
+                        ],
+                        [
+                            ['text' => '📊 History', 'callback_data' => 'main_menu'],
+                            ['text' => '🧾 License', 'callback_data' => 'main_menu']
+                        ],
+                        [
+                            ['text' => '🆘 Help', 'callback_data' => 'help']
+                        ]
+                    ]
+                ])
             ]);
-            // $message = $this->bot->sendMessage([
-            //     'chat_id' => $this->chat_id,
-            //     'text'    => 'Welcome To Code-180 Youtube Channel',
-            // ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
-        }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendPhoto(Request $request)
-    {
-        try {
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            // 1. https://anyurl/640
-            // 2. fopen('local/file/path', 'r')
-            // 3. fopen('https://picsum.photos/640', 'r'),
-            // 4. new InputFile(fopen('https://picsum.photos/640', 'r'), 'test-image.jpg')
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            $message = $this->bot->sendPhoto([
-                'chat_id' => $this->chat_id,
-                'photo'   => [
-                    'file'     => fopen(asset('public/upload/img.jpg'), 'r'),
-                    'filename' => 'demoImg.jpg',
-                ],
+        }else if($type == "help"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>📚 SignalAlert Bot Features:</b>
+                
+                <b>🔍 SIGNAL TRACKING</b>
+                • Track signals from SignalVision and other providers
+                • Real-time price monitoring
+                • Instant alerts when targets are reached
+                • Support for multiple trading pairs
+
+                <b>📊 TRADE MANAGEMENT</b>
+                • Separate real and demo trades
+                • Customize take profit strategies
+                • Update stop loss levels in real-time
+                • Track trade performance
+
+                <b>📈 HISTORY & ANALYTICS</b>
+                • Complete trading history
+                • Performance statistics
+                • Downloadable reports
+                • Win rate and profit tracking
+
+                <b>💳 SUBSCRIPTION</b>
+                • Demo: 3 free signals (SignalVision format only)
+                • Premium: Unlimited signals, all providers, analytics
+
+                Need assistance? Contact support@signalvision.com
+
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '🏠 Main Menu', 'callback_data' => 'main_menu'],
+                        ],
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendAudio(Request $request)
-    {
-        try {
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            // 1. https://picsum.photos/640
-            // 2. fopen('local/file/path', 'r')
-            // 3. fopen('https://picsum.photos/640', 'r'),
-            // 4. new InputFile(fopen('https://picsum.photos/640', 'r'), 'test-image.jpg')
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            $message = $this->bot->sendAudio([
-                'chat_id' => $this->chat_id,
-                'audio'   => fopen(asset('public/upload/demo.mp3'), 'r'),
-                'caption' => "Demo Audio File",
+        
+        // real trade 
+        else if($type == "real_trade"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>📝 Let's set up your real trade tracking.</b>
+                
+                What's your strategy for taking profits?
+
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '💸 Take Partial Profits', 'callback_data' => 'take_partial_profits'],
+                        ],
+                        [
+                            ['text' => '🎯 Close at Specific TP', 'callback_data' => 'close_specific_tp'],
+                        ],
+                        [
+                            ['text' => '🛠️ Manual Management', 'callback_data' => 'manual_management'],
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendVideo(Request $request)
-    {
-        try {
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            // 1. https://picsum.photos/640
-            // 2. fopen('local/file/path', 'r')
-            // 3. fopen('https://picsum.photos/640', 'r'),
-            // 4. new InputFile(fopen('https://picsum.photos/640', 'r'), 'test-image.jpg')
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            $message = $this->bot->sendVideo([
-                'chat_id' => $this->chat_id,
-                'video'   => fopen(asset('public/upload/Password.mp4'), 'r'),
+        else if($type == "take_partial_profits"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>🔄 How would you like to distribute your partial profits?</b>
+                
+                What's your strategy for taking profits?
+
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '⚖️ Equal at Each TP', 'callback_data' => 'equal_each_tp'],
+                            ['text' => '🧩 Custom Setup', 'callback_data' => 'custom_setup'],
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendVoice(Request $request)
-    {
-        try {
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            // 1. https://picsum.photos/640
-            // 2. fopen('local/file/path', 'r')
-            // 3. fopen('https://picsum.photos/640', 'r'),
-            // 4. new InputFile(fopen('https://picsum.photos/640', 'r'), 'test-image.jpg')
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            $message = $this->bot->sendVoice([
-                'chat_id' => $this->chat_id,
-                'voice'   => fopen(asset('public/upload/demo.mp3'), 'r'),
+        else if($type == "close_specific_tp"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>📍 At which Take Profit level would you like to close your entire position?</b>
+                
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '🎯 TP1', 'callback_data' => 'close_specific_tp1'],
+                            ['text' => '🎯 TP2', 'callback_data' => 'close_specific_tp2'],
+                            ['text' => '🎯 TP3', 'callback_data' => 'close_specific_tp3']
+                        ],
+                        [
+                            ['text' => '🎯 TP4', 'callback_data' => 'close_specific_tp4'],
+                            ['text' => '🎯 TP5', 'callback_data' => 'close_specific_tp5'],
+                            ['text' => '🎯 TP6', 'callback_data' => 'close_specific_tp6'],
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendDocument(Request $request)
-    {
-        try {
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            // 1. https://picsum.photos/640
-            // 2. fopen('local/file/path', 'r')
-            // 3. fopen('https://picsum.photos/640', 'r'),
-            // 4. new InputFile(fopen('https://picsum.photos/640', 'r'), 'test-image.jpg')
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            $message = $this->bot->sendDocument([
-                'chat_id'  => $this->chat_id,
-                'document' => fopen(asset('public/upload/Test_Doc.pdf'), 'r'),
+
+        else if($type == "equal_each_tp"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>What percentage of your position would you like to close at each TP level?</b>
+
+                EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '10%', 'callback_data' => 'equal_each_tp'],
+                            ['text' => '20%', 'callback_data' => 'custom_setup'],
+                            ['text' => '30%', 'callback_data' => 'custom_setup'],
+                            ['text' => '40%', 'callback_data' => 'custom_setup'],
+                            ['text' => '50%', 'callback_data' => 'custom_setup'],
+                        ],
+                        [
+                            ['text' => '🛠️Custom', 'callback_data' => 'custom_setup'],
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
-        }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendLocation(Request $request)
-    {
-        try {
-            $message = $this->bot->sendLocation([
-                'chat_id'   => $this->chat_id,
-                'latitude'  => 19.6840852,
-                'longitude' => 60.972437,
+        }else if($type == "custom_setup"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+            <b>Please specify the percentage to close at each TP level:</b>
+            EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => '📋 Open Form',
+                                'web_app' => ['url' => 'https://signalvision.ai/web-app/custom-partial']
+                            ]
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendVenue(Request $request)
-    {
-        try {
-            $message = $this->bot->sendVenue([
-                'chat_id'   => $this->chat_id,
-                'latitude'  => 19.6840852,
-                'longitude' => 60.972437,
-                'title'     => 'The New Word Of Code',
-                'address'   => 'Address For The Place',
+        else if($type == "trade_volume_question_amount"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+            <b>💰 What's the size of your trade?</b>
+
+            <b>Please enter either:</b>
+            - The amount in USDT (e.g., 100)
+
+            Type your answer or tap [Skip] to continue without recording size.
+            EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => '📋 Open Form',
+                                'web_app' => ['url' => 'https://signalvision.ai/web-app/custom-partial']
+                            ]
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendContact(Request $request)
-    {
-        try {
-            $message = $this->bot->sendContact([
-                'chat_id'      => $this->chat_id,
-                'photo'        => 'https://picsum.photos/640',
-                'phone_number' => '1234567890',
-                'first_name'   => 'Code-180',
+        else if($type == "trade_volume_question_amount"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+            <b>💰 What's the size of your trade?</b>
+
+            <b>Please enter either:</b>
+            - The amount in USDT (e.g., 100)
+            - Percentage of your balance (e.g., 5%)
+            - Number of coins (e.g., 0.5 BTC)
+
+            Type your answer or tap [Skip] to continue without recording size.
+            EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => '📋 Open Form',
+                                'web_app' => ['url' => 'https://signalvision.ai/web-app/custom-partial']
+                            ]
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function sendPoll(Request $request)
-    {
-        try {
-            $message = $this->bot->sendPoll([
-                'chat_id'  => $this->chat_id,
-                'question' => 'What is best coding language for 2023',
-                'options'  => ['python', 'javascript', 'typescript', 'php', 'java'],
+        else if($type == "trade_volume_question_amount"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+            <b>💰 What's the size of your trade?</b>
+
+            <b>Please enter either:</b>
+            - The amount in USDT (e.g., 100)
+            - Percentage of your balance (e.g., 5%)
+            - Number of coins (e.g., 0.5 BTC)
+
+            Type your answer or tap [Skip] to continue without recording size.
+            EOT,
+                'parse_mode' => 'HTML',
+                'reply_markup' => Keyboard::make([
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => '📋 Open Form',
+                                'web_app' => ['url' => 'https://signalvision.ai/web-app/custom-partial']
+                            ]
+                        ]
+                    ]
+                ])
             ]);
-        } catch (Exception $e) {
-            $message = 'Message: ' . $e->getMessage();
         }
-        return Response::json($message);
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public function aiShedule($text)
@@ -462,4 +686,13 @@ class TelegramBotController extends Controller
         }
     }
 
+
+
+    /*
+    Resoarch 
+    */
+    public function customPartial()
+    {
+        return view("telegram.custom-partial");
+    }
 }

@@ -31,3 +31,8 @@ Route::get('sendContact', [App\Http\Controllers\TelegramBotController::class, 's
 Route::get('sendPoll', [App\Http\Controllers\TelegramBotController::class, 'sendPoll']);
 Route::any('telegram-message-webhook', [App\Http\Controllers\TelegramBotController::class, 'telegram_webhook']);
 Route::get('bybit-info', [App\Http\Controllers\TelegramBotController::class, 'bybitInfo']);
+
+// webapp 
+Route::controller(App\Http\Controllers\TelegramBotController::class)->prefix("web-app")->group(function(){
+    Route::get('custom-partial', 'customPartial');
+});
