@@ -19,13 +19,23 @@ return new class extends Migration
             $table->string('market')->nullable();
             $table->string('entry_target')->nullable();
             $table->string('stop_loss')->nullable();
+            $table->string('leverage')->nullable();
             $table->string('take_profit1')->nullable();
             $table->string('take_profit2')->nullable();
             $table->string('take_profit3')->nullable();
             $table->string('take_profit4')->nullable();
             $table->string('take_profit5')->nullable();
-            $table->string('take_profit6')->nullable();
-            $table->string('status')->nullable();
+            $table->string('profit_strategy')->nullable();
+            $table->string('partial_profits_tp1')->nullable();
+            $table->string('partial_profits_tp2')->nullable();
+            $table->string('partial_profits_tp3')->nullable();
+            $table->string('partial_profits_tp4')->nullable();
+            $table->string('partial_profits_tp5')->nullable();
+            $table->string('specific_tp')->nullable();
+            $table->string('position_size_usdt')->nullable();
+            $table->string('position_size_coin')->nullable();
+            $table->string('status')->nullable(); 
+            $table->string('type')->nullable(); 
             $table->timestamps();
         });
     }

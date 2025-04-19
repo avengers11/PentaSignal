@@ -161,9 +161,6 @@ class ScheduleCryptoCommand extends Command
 
         // Notify users
         foreach ($schedules as $trade) {
-            // run jobs 
-            // ScheduleTakeLoseJob::dispatch($trade->id);
-
             $instrument = $trade->instruments;
             $market = $trade->market;
             $currentPrice = isset($prices[$market][$instrument]) ? (float)$prices[$market][$instrument] : null;
