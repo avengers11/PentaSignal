@@ -14,6 +14,11 @@ use DefStudio\Telegraph\Models\TelegraphChat;
 use DefStudio\Telegraph\Models\TelegraphBot;
 use Telegram\Bot\Api;
 use Telegram\Bot\Laravel\Facades\Telegram;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Excel as ExcelFormat;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class TelegramBotController extends Controller
 {
@@ -22,7 +27,7 @@ class TelegramBotController extends Controller
     //+++++++++++++++++++++++++++++++++++++++
     public function __construct()
     {
-        $this->bot = new TeleBot(env('TELEGRAM_BOT_HTTP'));
+        $this->bot = new TeleBot(env('TELEGRAM_BOT_TOKEN'));
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public function index()
@@ -128,16 +133,18 @@ class TelegramBotController extends Controller
                 $this->telegramMessageType("trade_volume_question_amount", $chatId);
             }
             // Trade Volume Question
-            else if($callbackData == "trade_volume_question_amount_skip"){
-                $this->tradeVolumeQuestionAmount($chatId, "Not Set");
+            else if($callbackData == "trade_volume_question_amount_usdt"){
+                // $this->tradeVolumeQuestionAmountUSDT($chatId, "Not Set");
+                $this->telegramMessageType("trade_volume_question_amount_usdt", $chatId);
             }
-            else if($callbackData == "trade_volume_question_coin_skip"){
-                $this->tradeVolumeQuestionCoin($chatId, "Not Set");
+            else if($callbackData == "trade_volume_question_amount_coins"){
+                // $this->tradeVolumeQuestionAmountCOIN($chatId, "Not Set");
+                $this->telegramMessageType("trade_volume_question_amount_coins", $chatId);
             }
             // strat tracking 
             else if($callbackData == "start_tracking"){
                 $schedule = ScheduleCrypto::where("chat_id", $chatId)->where("status", "pending")->first();
-                $schedule->status = "running"; 
+                $schedule->status = "waiting"; 
                 $schedule->save();
                 $user->state = null;
 
@@ -156,20 +163,20 @@ class TelegramBotController extends Controller
                 $this->telegramMessageType("trade_volume_question_amount", $chatId);
             }
             
-            // // close specific tp
-            // else if($callbackData == "close_specific_tp"){
-            //     $this->telegramMessageType("close_specific_tp", $chatId);
-            // }
-            // else if(str_starts_with($callbackData, 'close_specific_tp')){
-            //     $tp = str_replace('close_specific_tp_', '', $callbackData);
-            //     $schedule = ScheduleCrypto::where("chat_id", $chatId)->where("status", "pending")->first();
-            //     $schedule->specific_tp = $tp;
-            //     $schedule->profit_strategy = "specific_tp";
-            //     $schedule->save();
+            /*
+            =================
+            TRDAE NOTIFICATION  
+            =================
+            */
+            else if(str_starts_with($callbackData, 'update_trade_stop_loss_')){
+                $id = str_replace('update_trade_stop_loss_', '', $callbackData);
+                $schedule = ScheduleCrypto::where('id', $id)->first();
+                $user->state = "update_trade_stop_loss_$id";
+                $user->save();
 
-            //     $this->telegramMessageType("trade_volume_question_amount", $chatId);
-            // }
 
+                $this->telegramMessageType("update_trade_loss", $chatId);
+            }
            
 
             /*
@@ -180,8 +187,8 @@ class TelegramBotController extends Controller
             // close trade 
             else if(str_starts_with($callbackData, 'close_trade_')){
                 $scheduleId = str_replace('close_trade_', '', $callbackData);
-                if(!ScheduleCrypto::where('id', $scheduleId)->where('status', 'close')->exists()){
-                    $this->telegramMessageType("close_trade", $chatId, ["scheduleId" => $scheduleId]);
+                if(!ScheduleCrypto::where('id', $scheduleId)->where('status', 'closed')->exists()){
+                    $this->telegramMessageType("close_trade", $chatId, ["id" => $scheduleId]);
                 }else{
                     $this->bot->editMessageText([
                         'chat_id' => $chatId,
@@ -195,8 +202,8 @@ class TelegramBotController extends Controller
             // yes close trade
             else if(str_starts_with($callbackData, 'yes_close_trade_')){
                 $scheduleId = str_replace('yes_close_trade_', '', $callbackData);
-                if(!ScheduleCrypto::where('id', $scheduleId)->where('status', 'close')->exists()){
-                    $tradeUpdated = ScheduleCrypto::where('id', $scheduleId)->update(['status' => 'close']);
+                if(!ScheduleCrypto::where('id', $scheduleId)->where('status', 'closed')->exists()){
+                    $tradeUpdated = ScheduleCrypto::where('id', $scheduleId)->update(['status' => 'closed']);
                     $this->bot->editMessageText([
                         'chat_id' => $chatId,
                         'message_id' => $messageId,
@@ -223,7 +230,7 @@ class TelegramBotController extends Controller
 
              /*
             =================
-            Trade History 
+            Trade History   
             =================
             */ 
             else if(str_starts_with($callbackData, 'history_trades_type')){
@@ -231,8 +238,20 @@ class TelegramBotController extends Controller
                 $this->telegramMessageType("history_trades_type", $chatId, ["type" => $type]);
             }
             else if(str_starts_with($callbackData, 'statistics_trades_type')){
-                $type = str_replace('statistics_trades_type_', '', $callbackData);
-                $this->telegramMessageType("statistics_trades_type", $chatId, ["type" => $type]);
+                $data = str_replace('statistics_trades_type_', '', $callbackData);
+                $explode = explode("_", $data);
+                $type = $explode[0];
+                $date = $explode[1];
+
+                $this->telegramMessageType("statistics", $chatId, ["type" => $type, "date" => $date]);
+            }
+            else if(str_starts_with($callbackData, 'statistics_trades_change_time')){
+                $data = str_replace('statistics_trades_change_time_', '', $callbackData);
+                $explode = explode("_", $data);
+                $type = $explode[0];
+                $date = $explode[1];
+
+                $this->telegramMessageType("statistics_trades_change_time", $chatId, ["type" => $type, "date" => $date]);
             }
 
             $user->save();
@@ -256,7 +275,7 @@ class TelegramBotController extends Controller
 
         // track signal 
         if ($text === '➕ Track Signal') {
-            $user->state = "track_new_signal";
+            $user->state = null;
             $user->save();
 
             $this->telegramMessageType("track_signal", $chatId);
@@ -440,41 +459,6 @@ class TelegramBotController extends Controller
                             ]
                         ])
                     ]);
-
-                    return;
-                    // 📈 Price fetching
-                    $bybitInfo = bybitInfo($coinType, $market);
-                    if ($bybitInfo["status"]) {
-                        $price = $bybitInfo['price'];
-                        $this->bot->sendMessage([
-                            'chat_id' => $chatId,
-                            'text' => "💰 Current Price of $coinType: $price USD",
-                        ]);
-
-                        // save data 
-                        $crypto = new ScheduleCrypto();
-                        $crypto->chat_id = $chatId;
-                        $crypto->instruments = $coinType;
-                        $crypto->entry_target = $entryTarget;
-                        $crypto->market = $market;
-                        $crypto->tp_mode = $tpMode;
-                        $crypto->stop_loss = $stopLoss;
-                        $crypto->take_profit1 = $tp1;
-                        $crypto->take_profit2 = $tp2;
-                        $crypto->take_profit3 = $tp3;
-                        $crypto->take_profit4 = $tp4;
-                        $crypto->take_profit5 = $tp5;
-                        $crypto->take_profit6 = $tp6;
-                        $crypto->status = "running";
-                        $crypto->save();
-
-                    } else {
-                        $this->bot->sendMessage([
-                            'chat_id' => $chatId,
-                            'text' => "❌ Error fetching price: " . $bybitInfo["msg"],
-                        ]);
-                    }
-
                 } else {
                     $this->bot->sendMessage([
                         'chat_id' => $chatId,
@@ -510,14 +494,36 @@ class TelegramBotController extends Controller
                 $this->takePartialProfits($chatId, $text);
             }
             // question 
-            elseif($user->state == "trade_volume_question_amount"){
-                $this->tradeVolumeQuestionAmount($chatId, $text);
+            elseif($user->state == "trade_volume_question_amount_usdt"){
+                $this->tradeVolumeQuestionAmountUSDT($chatId, $text);
             }
-            elseif($user->state == "trade_volume_question_coin"){
-                $this->tradeVolumeQuestionCoin($chatId, $text);
+            elseif($user->state == "trade_volume_question_amount_coins"){
+                $this->tradeVolumeQuestionAmountCOIN($chatId, $text);
+            }
+
+            // loss
+            elseif($user->state == ""){
+                $this->tradeVolumeQuestionAmountCOIN($chatId, $text);
+            }
+            else if(str_starts_with($user->state, 'update_trade_stop_loss_')){
+                $id = str_replace('update_trade_stop_loss_', '', $user->state);
+
+                $schedule = ScheduleCrypto::where('id', $id)->first();
+                $schedule->stop_loss = $text;
+                $schedule->save();
+
+                $user->state = null;
+                $user->save();
+
+                $this->bot->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => <<<EOT
+                    <b>✅ Congratulations! Stop loss successfully updated.</b>
+                    EOT,
+                    'parse_mode' => 'HTML',
+                ]);
             }
         }
-
         
         return response('ok');
     }
@@ -526,6 +532,8 @@ class TelegramBotController extends Controller
     */
     private function telegramMessageType($type, $chatId, $data=[])
     {
+        $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
+
         // main menu
         if($type == "main_menu"){
             Telegram::sendMessage([
@@ -615,10 +623,20 @@ class TelegramBotController extends Controller
         */
         // My Signals
         else if($type == "my_signals"){
+
+            // Get all latest running trades
             $schedules = ScheduleCrypto::latest()
             ->where("chat_id", $chatId)
-            ->where("status", "running")
+            ->where("status", ["running", "waiting"])
             ->get();
+
+            // Group instruments by market & format them
+            $groupedInstruments = $schedules->groupBy('market')->map(function ($group) {
+                return $group->pluck('instruments')
+                    ->map(fn($item) => str_replace('-', '', strtoupper($item)))
+                    ->unique()
+                    ->values();
+            })->toArray();
 
             // If No Active Trades
             if(count($schedules) < 1){
@@ -629,20 +647,16 @@ class TelegramBotController extends Controller
 
                     Forward a signal from SignalVision to start tracking.
                     EOT,
-                    'parse_mode' => 'HTML',
-                    'reply_markup' => json_encode([
-                        'keyboard' => [
-                            ['📈 View History', '🏠 Main Menu']
-                        ],
-                        'resize_keyboard' => true,
-                        'one_time_keyboard' => true
-                    ])
+                    'parse_mode' => 'HTML'
                 ]);
                 return "ok";
             }
         
+            $combainData = combineCryptoPrices($groupedInstruments)->getData(true);
+            
             foreach ($schedules as $value) {
                 $type = strtoupper($value->type);
+                $currentPrice = isset($combainData[$value->market][$value->instrument]) ? formatNumberFlexible($combainData[$value->market][$value->instrument]) : null;
 
                 Telegram::sendMessage([
                     'chat_id' => $chatId,
@@ -698,15 +712,16 @@ class TelegramBotController extends Controller
         }
         // close trade
         else if($type == "close_trade"){
+            $schedule = ScheduleCrypto::where('id', $data["id"])->first();
+
             Telegram::sendMessage([
                 'chat_id' => $chatId,
                 'text' => <<<EOT
                 <b>❓ Are you sure you want to close this trade?</b>
                 
-                [PAIR-USDT] [LONG/SHORT]
-                Entry: [Entry Price]
-                Current Price: [Current Price]
-                Profit/Loss: [P/L%]
+                $schedule->instruments $schedule->tp_mode
+                Entry: $schedule->entry_target$
+                Stop Loss: $schedule->stop_loss$
 
                 EOT,
                 'parse_mode' => 'HTML',
@@ -714,7 +729,7 @@ class TelegramBotController extends Controller
                 'reply_markup' => json_encode([
                     'inline_keyboard' => [
                         [
-                            ['text' => '✅ Yes, Close Trade', 'callback_data' => "yes_close_trade_".$data['scheduleId']],
+                            ['text' => '✅ Yes, Close Trade', 'callback_data' => "yes_close_trade_".$data['id']],
                             ['text' => '❌ Cancel', 'callback_data' => 'cancel_close_trade'],
                         ]
                     ]
@@ -751,6 +766,9 @@ class TelegramBotController extends Controller
                 EOT,
                 'parse_mode' => 'HTML'
             ]);
+
+            $user->state = "track_new_signal";
+            $user->save();
         }
         // trade type  
         else if($type == "trade_type"){
@@ -864,22 +882,35 @@ class TelegramBotController extends Controller
                 'text' => <<<EOT
                 <b>💰 What's the size of your trade?</b>
 
-                <b>Please enter either:</b>
-                - The amount in USDT (e.g., 100)
-
-                Type your answer or tap [Skip] to continue without recording size.
+                📌 Please choose the type of amount you'll use for this trade — for example, in coins (e.g., BTC, ETH) or in USDT.
                 EOT,
                 'parse_mode' => 'HTML',
                 'reply_markup' => Keyboard::make([
                     'inline_keyboard' => [
                         [
-                            ['text' => '🎯 Skip', 'callback_data' => 'trade_volume_question_amount_skip']
+                            ['text' => '💵 USDT', 'callback_data' => 'trade_volume_question_amount_usdt'],
+                            ['text' => '🪙 Coins', 'callback_data' => 'trade_volume_question_amount_coins'],
                         ]
                     ]
                 ])
             ]);
         }
-        else if($type == "trade_volume_question_coin"){
+        else if($type == "trade_volume_question_amount_usdt"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>💰 What's the size of your trade?</b>
+
+                <b>Please enter either:</b>
+                - The amount in USDT (e.g., 100)
+                EOT,
+                'parse_mode' => 'HTML',
+            ]);
+
+            $user->state = "trade_volume_question_amount_usdt";
+            $user->save();
+        }
+        else if($type == "trade_volume_question_amount_coins"){
             $this->bot->sendMessage([
                 'chat_id' => $chatId,
                 'text' => <<<EOT
@@ -887,23 +918,17 @@ class TelegramBotController extends Controller
 
                 <b>Please enter either:</b>
                 - Number of coins (e.g., 0.5 BTC)
-
-                Type your answer or tap [Skip] to continue without recording size.
                 EOT,
-                'parse_mode' => 'HTML',
-                'reply_markup' => Keyboard::make([
-                    'inline_keyboard' => [
-                        [
-                            ['text' => '🎯 Skip', 'callback_data' => 'trade_volume_question_coin_skip']
-                        ]
-                    ]
-                ])
+                'parse_mode' => 'HTML'
             ]);
+
+            $user->state = "trade_volume_question_amount_coins";
+            $user->save();
         }
 
         /*
         =====================
-            history
+            history 
         =====================
         */
         else if($type == "history"){
@@ -918,11 +943,10 @@ class TelegramBotController extends Controller
                         [
                             ['text' => '💰 Real Trades', 'callback_data' => 'history_trades_type_real'],
                             ['text' => '🕹️ Demo Trades', 'callback_data' => 'history_trades_type_demo'],
-                            ['text' => '📋 All Trades', 'callback_data' => 'history_trades_type_all'],
                         ],
                         [
-                            ['text' => '📥 Download Excel', 'callback_data' => 'download_excel'],
-                            ['text' => '📊 Statistics', 'callback_data' => 'statistics'],
+                            ['text' => '📋 All Trades', 'callback_data' => 'history_trades_type_all'],
+                            ['text' => '📊 Statistics', 'callback_data' => 'statistics_trades_type_real_all'],
                         ]
                     ]
                 ])
@@ -931,118 +955,198 @@ class TelegramBotController extends Controller
         else if($type == "history_trades_type"){
             $type = $data['type'];
 
-            for ($i=0; $i < 11; $i++) { 
-                Telegram::sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => <<<EOT
-                    [PAIR1-USDT] [LONG/SHORT] {$type}
-                    Entry: [Entry]
-                    Exit: [Exit]
-                    Result: [Hit TP3/SL/Manually Closed]
-                    Date: [Date Range]
-                    EOT,
-                    'parse_mode' => 'HTML',
+            // header 
+            $headerRealTradeColumn = ["Trading pair", "Direction", "Entry price", "Stop Loss level", "Take Profit targets", "Entry date/time", "Exit date/time", "Result", "Percentage profit/loss", "Actual profit/loss amount", "Volume traded", "Leverage used", "Profit strategy used", "Partial profits taken", "Days in trade"];
+            $headerDemoTradeColumn = ["Trading pair", "Direction", "Entry price", "Stop Loss level", "Take Profit targets", "Entry date/time", "Exit date/time", "Result", "Theoretical profit/loss percentage", "Days in trade"];
+            $headerAllTradeColumn = ["Trading pair", "Direction", "Entry price", "Stop Loss level", "Take Profit targets", "Entry date/time", "Exit date/time", "Result", "Theoretical profit/loss percentage", "Days in trade", "Type"];
+
+            // 1. Define select fields
+            $selectFields = [
+                'instruments as Trading_pair',
+                'tp_mode as Direction',
+                'entry_target as Entry_price',
+                'stop_loss as Stop_Loss_level',
+                'profit_strategy as Take_Profit_targets',
+                'trade_entry as Entry_date_time',
+                'trade_exit as Exit_date_time',
+                'profit_loss as Result',
+                'profit_loss as Percentage_profit_loss',
+            ];
+
+            // 2. Conditionally add fields if type is 'real'
+            if ($type === 'real') {
+                $selectFields = array_merge($selectFields, [
+                    'actual_profit_loss as Actual_profit_loss_amount',
+                    'leverage as Volume_traded',
+                    'leverage as Leverage_used',
+                    'profit_strategy as Profit_strategy_used',
+                    DB::raw("CONCAT_WS(', ', partial_profits_tp1, partial_profits_tp2, partial_profits_tp3, partial_profits_tp4, partial_profits_tp5) as Partial_profits_taken"),
                 ]);
             }
 
-            // Filter 
-            Telegram::sendMessage([
+            // 3. Add Days in trade
+            $selectFields[] = DB::raw("DATEDIFF(trade_exit, trade_entry) as Days_in_trade");
+
+            // 4. Get the data
+            $schedules = ScheduleCrypto::where('chat_id', $chatId)
+                ->when($type !== 'all', fn($q) => $q->where('type', $type))
+                ->select($selectFields)
+                ->get();
+
+            // 5. Log or handle if empty
+            if ($schedules->isEmpty()) {
+                Telegram::sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "❗ No trades found to export.",
+                ]);
+                return;
+            }
+
+
+            $headerRow = array_keys($schedules->first()->toArray());
+            $dataRows = $schedules->map(function ($item) {
+                return array_values($item->toArray());
+            })->toArray();
+
+            // 6. Prepare Excel data
+            $excelData = collect([$headerRow])->merge($dataRows);
+
+            // 7. Store Excel file
+            $fileName = $type . "_trades.xlsx";
+            $tempPath = 'temp/' . $fileName;
+
+            Excel::store(new class($excelData) implements \Maatwebsite\Excel\Concerns\FromCollection {
+                public function __construct(public Collection $data) {}
+                public function collection() {
+                    return $this->data;
+                }
+            }, $tempPath, 'local');
+
+            // 8. Send the file to Telegram
+            $fileFullPath = storage_path("app/{$tempPath}");
+
+            Telegram::sendDocument([
                 'chat_id' => $chatId,
-                'text' => '⏳ Choose a Time Period to Filter Your Trade History:',
-                'parse_mode' => 'HTML',
-                'reply_markup' => json_encode([
-                    'inline_keyboard' => [
-                        [
-                            ['text' => '📆 Last Week', 'callback_data' => "history_trades_type_week_$type"],
-                            ['text' => '🗓️ Last Month', 'callback_data' => "history_trades_type_month_$type"],
-                            ['text' => '📊 Last 3 Months', 'callback_data' => "history_trades_3month_type_$type"],
-                        ],
-                        [
-                            ['text' => '📥 Download Excel', 'callback_data' => "download_trades_type_$type"],
-                            ['text' => '📈 View Statistics', 'callback_data' => "statistics_trades_type_$type"],
-                        ]
-                    ]
-                ])
+                'document' => fopen($fileFullPath, 'r'),
+                'caption' => '📥 Here is your Excel file containing trade history.',
             ]);
+
+            // 9. Delete temp file
+            unlink($fileFullPath);
         }
-        else if($type == "statistics_trades_type"){
+        else if($type == "statistics"){
             $type = $data['type'];
+            $typeUC = ucfirst($data['type']);
+            $date = $data['date'];
+            $dateUC = ucfirst($data['date']);
+
+            // date text 
+            $dateTxt = "";
+            if($date == "7"){
+                $dateTxt = "Last Week";
+            }else if($date == "30"){
+                $dateTxt = "Last Month";
+            }else if($date == "90"){
+                $dateTxt = "Last 3 Months";
+            }else{
+                $dateTxt = "All Time";
+            }
+
+            // Get schedules based on type
+            $schedules = ScheduleCrypto::where('chat_id', $chatId)
+            ->when($type !== 'all', fn($q) => $q->where('type', $type))
+            ->when($date !== 'all', function ($q) use ($date) {
+                $q->whereDay('created_at', $date);
+            })
+            ->get();
+
+
+            // Count totals
+            $totalTrade = $schedules->count();
+            $totalProfitTrade = $schedules->where('profit_loss', 'profit')->count();
+            $totalLossTrade = $schedules->where('profit_loss', 'loss')->count();
+
+            // Calculated values with safe division
+            $safeDivide = fn($a, $b) => $b > 0 ? round(($a / $b) * 100, 2) : 0;
+
+            $totalProfitLossTrade   = $safeDivide($totalProfitTrade, $totalLossTrade);
+            $totalAverageWinTrade   = $safeDivide($totalTrade, $totalProfitTrade);
+            $totalAverageLossTrade  = $safeDivide($totalTrade, $totalLossTrade);
+            $totalWinRateTrade      = $safeDivide($totalProfitTrade, $totalTrade);
 
             // Filter 
             Telegram::sendMessage([
                 'chat_id' => $chatId,
                 'text' => <<<EOT
-                📈 Trading Performance: {$type}
+                📈 Trading Performance:
                 
-                📅 Time Period: [Selected Period]
-                📊 Total Trades: [X]
-                ❌ Loss Trades: [Z] ([Z/X]%)
-                💰 Total Profit/Loss: [P/L%] ([P/L USDT])
-                📈 Average Win: [Avg Win%]
-                📉 Average Loss: [Avg Loss%]
-                ⚡ Win Rate: [Win Rate%]
-                📊 Profit Factor: [Profit Factor]
+                📅 Trade Type: {$typeUC}
+                📅 Time Period: {$dateTxt}
+                📊 Total Trades: {$totalTrade}
+                ✅ Profitable Trades: {$totalProfitTrade}
+                ❌ Loss Trades: {$totalLossTrade}
+                💰 Total Profit/Loss: {$totalProfitLossTrade}%
+                📈 Average Win: {$totalAverageWinTrade}%
+                📉 Average Loss: {$totalAverageLossTrade}%
+                ⚡ Win Rate: {$totalWinRateTrade}%
                 EOT,
                 'parse_mode' => 'HTML',
                 'reply_markup' => json_encode([
                     'inline_keyboard' => [
                         [
-                            ['text' => '💰 Real Trades', 'callback_data' => "history_trades_type_week_$type"],
-                            ['text' => '🕹️ Demo Trades', 'callback_data' => "history_trades_type_month_$type"],
-                            ['text' => '📋 All Trades', 'callback_data' => "history_trades_3month_type_$type"],
+                            ['text' => '💰 Real', 'callback_data' => "statistics_trades_type_real_all"],
+                            ['text' => '🕹️ Demo', 'callback_data' => "statistics_trades_type_demo_all"],
                         ],
                         [
-                            ['text' => '🗓️ Change Time Period', 'callback_data' => "change_time_period_$type"],
-                            ['text' => '📥 Download Excel', 'callback_data' => "download_excel_type_$type"],
+                            ['text' => '📋 All Trades', 'callback_data' => "statistics_trades_type_all_all"],
+                        ],
+                        [
+                            ['text' => '🗓️ Change Time Period', 'callback_data' => "statistics_trades_change_time_".$type."_all"],
+                        ]
+                    ]
+                ])
+            ]);
+        }
+        else if($type == "statistics_trades_change_time"){
+            $type = ucfirst($data['type']);
+
+            // Filter 
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => "⏳ Choose a Time Period to Filter Your {$type} Trade Performance:",
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => [
+                        [
+                            ['text' => '📅 Last Week', 'callback_data' => "statistics_trades_type_".$type."_7"],
+                            ['text' => '🗓️ Last Month', 'callback_data' => "statistics_trades_type_".$type."_30"],
+                        ],
+                        [
+                            ['text' => '📊 Last 3 Months', 'callback_data' => "statistics_trades_type_".$type."_90"],
+                            ['text' => '🌐 All Time', 'callback_data' => "statistics_trades_type_".$type."_all"],
                         ]
                     ]
                 ])
             ]);
         }
 
+       /*
+        =====================
+            Notifications  
+        =====================
+        */
+        else if($type == "update_trade_loss"){
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>💰 What's the new stop loss?</b>
 
-        // else if($type == "equal_each_tp"){
-        //     $this->bot->sendMessage([
-        //         'chat_id' => $chatId,
-        //         'text' => <<<EOT
-        //         <b>What percentage of your position would you like to close at each TP level?</b>
-
-        //         EOT,
-        //         'parse_mode' => 'HTML',
-        //         'reply_markup' => Keyboard::make([
-        //             'inline_keyboard' => [
-        //                 [
-        //                     ['text' => '10%', 'callback_data' => 'equal_each_tp'],
-        //                     ['text' => '20%', 'callback_data' => 'custom_setup'],
-        //                     ['text' => '30%', 'callback_data' => 'custom_setup'],
-        //                     ['text' => '40%', 'callback_data' => 'custom_setup'],
-        //                     ['text' => '50%', 'callback_data' => 'custom_setup'],
-        //                 ],
-        //                 [
-        //                     ['text' => '🛠️Custom', 'callback_data' => 'custom_setup'],
-        //                 ]
-        //             ]
-        //         ])
-        //     ]);
-        // }else if($type == "custom_setup"){
-        //     $this->bot->sendMessage([
-        //         'chat_id' => $chatId,
-        //         'text' => <<<EOT
-        //     <b>Please specify the percentage to close at each TP level:</b>
-        //     EOT,
-        //         'parse_mode' => 'HTML',
-        //         'reply_markup' => Keyboard::make([
-        //             'inline_keyboard' => [
-        //                 [
-        //                     [
-        //                         'text' => '📋 Open Form',
-        //                         'web_app' => ['url' => 'https://signalvision.ai/web-app/custom-partial']
-        //                     ]
-        //                 ]
-        //             ]
-        //         ])
-        //     ]);
-        // }
+                <b>Please enter:</b>
+                - The amount in Digit (e.g., 100, 10.10)
+                EOT,
+                'parse_mode' => 'HTML',
+            ]);
+        }
         
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1175,7 +1279,7 @@ class TelegramBotController extends Controller
         }
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function  tradeVolumeQuestionAmount($chatId, $text)
+    public function  tradeVolumeQuestionAmountUSDT($chatId, $text)
     {
         $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
         $schedule = ScheduleCrypto::where("chat_id", $chatId)->where("status", "pending")->first();
@@ -1191,19 +1295,15 @@ class TelegramBotController extends Controller
             return "ok";
         }
 
-        $text = trim($text);
-        $schedule->position_size_usdt = $text;
-        $schedule->save();
-
-        $user->state = "trade_volume_question_coin";
-        $user->save();
-
-        $this->telegramMessageType("trade_volume_question_coin", $chatId);
-    }
-    public function  tradeVolumeQuestionCoin($chatId, $text)
-    {
-        $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
-        $schedule = ScheduleCrypto::where("chat_id", $chatId)->where("status", "pending")->first();
+        if (strlen($text) > 11) {
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => <<<EOT
+                <b>❌ Number must not be longer than 20 characters.</b>
+                EOT,
+            ]);
+            return; 
+        }
 
         Telegram::sendMessage([
             'chat_id' => $chatId,
@@ -1222,41 +1322,61 @@ class TelegramBotController extends Controller
             ])
         ]);
 
-        $schedule->position_size_coin = $text;
+        $text = trim($text);
+        $schedule->position_size_usdt = $text;
         $schedule->save();
 
         $user->state = "start_tracking";
         $user->save();
     }
-    
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public function handleCallbackQuery($update)
+    public function  tradeVolumeQuestionAmountCOIN($chatId, $text)
     {
-        $callback = $update->getCallbackQuery();
-        $data = $callback->getData(); // e.g., "cancel_trade_12"
+        $user = TelegramUser::firstOrCreate(['chat_id' => $chatId]);
+        $schedule = ScheduleCrypto::where("chat_id", $chatId)->where("status", "pending")->first();
+        if(empty($schedule)){
+            $user->state = "track_new_signal";
+            $user->save();
 
-        if (\Illuminate\Support\Str::startsWith($data, 'cancel_trade_')) {
-            $tradeId = str_replace('cancel_trade_', '', $data);
+            $this->bot->sendMessage([
+                'chat_id' => $chatId,
+                'text' => "Something went wrong, Please with new signal!",
+            ]);
 
-            // Cancel the trade in your backend
-            $trade = ScheduleCrypto::find($tradeId);
-            if ($trade && $trade->status === 'running') {
-                $trade->status = 'cancelled';
-                $trade->save();
-
-                $this->bot->answerCallbackQuery([
-                    'callback_query_id' => $callback->getId(),
-                    'text' => "✅ Trade for {$trade->instruments} has been cancelled.",
-                    'show_alert' => false
-                ]);
-            } else {
-                $this->bot->answerCallbackQuery([
-                    'callback_query_id' => $callback->getId(),
-                    'text' => "⚠️ Trade already cancelled or not found.",
-                    'show_alert' => true
-                ]);
-            }
+            return "ok";
         }
+
+        if (strlen($text) > 11) {
+            Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => '❌ Number must not be longer than 20 characters.',
+            ]);
+            return; 
+        }
+
+        Telegram::sendMessage([
+            'chat_id' => $chatId,
+            'text' => <<<EOT
+            <b>✅ Trade Tracking Setup Complete!</b>
+
+            EOT,
+            'parse_mode' => 'HTML',
+            'reply_markup' => json_encode([
+                'inline_keyboard' => [
+                    [
+                        ['text' => '✅ Start Tracking', 'callback_data' => "start_tracking"],
+                        ['text' => '✏️ Edit Settings', 'callback_data' => "edit_trade_settings"],
+                    ]
+                ]
+            ])
+        ]);
+
+        
+        $text = trim($text);
+        $schedule->position_size_coin = $text;
+        $schedule->save();
+
+        $user->state = "start_tracking";
+        $user->save();
     }
 
 
@@ -1264,8 +1384,27 @@ class TelegramBotController extends Controller
     /*
     Resoarch 
     */
-    public function customPartial()
+    public function crypto(Request $request)
     {
-        return view("telegram.custom-partial");
+        $details = [
+            "binance" => [
+                "BTCUSDT",
+                "LTCUSDT"
+            ],
+            "bybit" => [
+                "BTCUSDT"
+            ]
+        ];
+
+        $response = Http::get("https://msw-app.com/crypto", [
+            "details" => $details
+        ]);
+        
+        return $response->json();
+
+
+        $combainData = combineCryptoPrices($details)->getData(true);
+
+        return (float)$combainData["bybit"]["BTCUSDT"];
     }
 }

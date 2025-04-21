@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('market')->nullable();
             $table->string('entry_target')->nullable();
             $table->string('stop_loss')->nullable();
+            $table->string('profit_loss')->nullable();
             $table->string('leverage')->nullable();
             $table->string('take_profit1')->nullable();
             $table->string('take_profit2')->nullable();
@@ -34,6 +35,7 @@ return new class extends Migration
             $table->string('specific_tp')->nullable();
             $table->string('position_size_usdt')->nullable();
             $table->string('position_size_coin')->nullable();
+            $table->string('last_alert')->nullable();
             $table->string('status')->nullable(); 
             $table->string('type')->nullable(); 
             $table->timestamps();

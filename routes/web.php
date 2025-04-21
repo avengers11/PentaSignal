@@ -30,7 +30,7 @@ Route::get('sendVenue', [App\Http\Controllers\TelegramBotController::class, 'sen
 Route::get('sendContact', [App\Http\Controllers\TelegramBotController::class, 'sendContact']);
 Route::get('sendPoll', [App\Http\Controllers\TelegramBotController::class, 'sendPoll']);
 Route::any('telegram-message-webhook', [App\Http\Controllers\TelegramBotController::class, 'telegram_webhook']);
-Route::get('bybit-info', [App\Http\Controllers\TelegramBotController::class, 'bybitInfo']);
+Route::get('crypto', [App\Http\Controllers\TelegramBotController::class, 'crypto']);
 
 // webapp 
 Route::controller(App\Http\Controllers\TelegramBotController::class)->prefix("web-app")->group(function(){
