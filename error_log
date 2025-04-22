@@ -288,3 +288,5 @@ Stack trace:
 #8 /home/pentaforce/email-campaign.pentaforce.app/artisan(33): Illuminate\Foundation\Application->make('Illuminate\\Cont...')
 #9 {main}
   thrown in /home/pentaforce/email-campaign.pentaforce.app/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 914
+[21-Apr-2025 17:10:29 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home/signalvision/app.signalvision.ai/vendor/composer/platform_check.php on line 28
+[21-Apr-2025 17:13:44 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home/signalvision/app.signalvision.ai/vendor/composer/platform_check.php on line 28

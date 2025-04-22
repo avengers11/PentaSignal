@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Setting;
+use WeStacks\TeleBot\TeleBot;
 use App\Models\ScheduleCrypto;
 use Illuminate\Console\Command;
 use App\Jobs\ScheduleTakeLoseJob;
@@ -15,124 +17,11 @@ class ScheduleCryptoCommand extends Command
      * @var string
      */
     protected $signature = 'run:schedule-crypto'; // php artisan run:schedule-crypto
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
-    // public function handle()
-    // {
-    //     // get latest runing trades 
-    //     $schedules = ScheduleCrypto::latest()
-    //     ->where("status", "running")
-    //     ->get()
-    //     ->groupBy('market');
-
-    //     // Format:
-    //     $groupedInstruments = $schedules->map(function ($group) {
-    //         return $group->pluck('instruments')
-    //             ->map(fn($item) => strtoupper($item)) // make uppercase
-    //             ->unique()
-    //             ->values();
-    //     });
-
-    //     // collect all market prices 
-    //     $prices = [];
-    //     foreach ($groupedInstruments as $key => $instrumentLists) {
-    //         $instrumentString = collect($instrumentLists)->implode(',');
-    //         $bybitInfo = bybitMultiInfo($instrumentString, $key);
-    //         if ($bybitInfo["status"]) {
-    //             $price = collect($bybitInfo['price'])
-    //             ->mapWithKeys(function ($item, $key) {
-    //                 return [$key => number_format($item['PRICE'], 2)];
-    //             })
-    //             ->toArray();
-
-    //             $prices[$key] = $price;
-    //         }
-    //     }
-
-
-    //     // notify to users  
-    //     $scheduleUserss = ScheduleCrypto::latest()
-    //     ->where("status", "running")
-    //     ->get();
-    //     foreach ($scheduleUserss as $value) {
-    //         $currentPrice = (int)$prices[$value->market][$value->instruments];
-    //         $chat_id = $value->chat_id;
-    //         $mod = $value->tp_mode;
-    //         $entry_target = (int)$value->entry_target;
-    //         $instruments = $value->instruments;
-    //         $sl = (int)$value->stop_loss;
-    //         $tp1 = (int)$value->take_profit1;
-    //         $tp2 = (int)$value->take_profit2;
-    //         $tp3 = (int)$value->take_profit3;
-    //         $tp4 = (int)$value->take_profit4;
-    //         $tp5 = (int)$value->take_profit5;
-    //         $tp6 = (int)$value->take_profit6;
-
-    //         // notify for sl 
-    //         if($mod == "LONG"){
-    //             // stop lose 
-    //             if($currentPrice < $sl){
-    //                 aiAdvisorTakeLose($instruments, $mod, $entry_target, $sl, $currentPrice, $chat_id);
-    //             }
-
-    //             // take profit 
-    //             else if($currentPrice > $tp1 && $currentPrice > $tp2){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 1, $currentPrice, $chat_id);
-    //             }else if($currentPrice > $tp2 && $currentPrice > $tp3){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 2, $currentPrice, $chat_id);
-    //             }else if($currentPrice > $tp3 && $currentPrice > $tp4){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 3, $currentPrice, $chat_id);
-    //             }else if($currentPrice > $tp4 && $currentPrice > $tp5){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 4, $currentPrice, $chat_id);
-    //             }else if($currentPrice > $tp5 && $currentPrice > $tp6){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 5, $currentPrice, $chat_id);
-    //             }else if($currentPrice > $tp6){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 6, $currentPrice, $chat_id);
-    //             }else{
-    //                 stopSchedule($value->id);
-    //             }
-
-    //         }
-            
-    //         else{
-    //             // stop lose 
-    //             if($currentPrice > $sl){
-    //                 aiAdvisorTakeLose($instruments, $mod, $entry_target, $sl, $currentPrice, $chat_id);
-    //             }
-
-    //             // take profit 
-    //             else if($currentPrice < $tp1 && $currentPrice < $tp2){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 1, $currentPrice, $chat_id);
-    //             }else if($currentPrice < $tp2 && $currentPrice < $tp3){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 2, $currentPrice, $chat_id);
-    //             }else if($currentPrice < $tp3 && $currentPrice < $tp4){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 3, $currentPrice, $chat_id);
-    //             }else if($currentPrice < $tp4 && $currentPrice < $tp5){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 4, $currentPrice, $chat_id);
-    //             }else if($currentPrice < $tp5 && $currentPrice < $tp6){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 5, $currentPrice, $chat_id);
-    //             }else if($currentPrice < $tp6){
-    //                 aiAdvisorTakeProfit($instruments, $mod, $entry_target, $sl, 6, $currentPrice, $chat_id);
-    //             }else{
-    //                 stopSchedule($value->id);
-    //             }
-    //         }
-    //     }
-    // }
-
-
-
     public function handle()
     {
+        // Log::info("Cron called");
+
         // Get all latest running trades
         $schedules = ScheduleCrypto::latest()
         ->whereIn("status", ["running", "waiting"])
@@ -152,7 +41,20 @@ class ScheduleCryptoCommand extends Command
         /*
         Price Ex:
         */
-        $combainData = combineCryptoPrices($groupedInstruments)->getData(true);
+        $combainData = combineCryptoPrices($groupedInstruments);
+
+        $setting = Setting::where("key", "crypto_data")->first();
+        $setting->value = $combainData;
+        $setting->save();
+
+        // $combainData = [
+        //     "binance" => [
+        //         "LTCUSDT" => '75.9'
+        //     ],
+        //     "bybit" => [
+        //         "BTCUSDT" => '78.81'
+        //     ]
+        // ];
         // Log::info($combainData);
         
         // return;
@@ -180,9 +82,9 @@ class ScheduleCryptoCommand extends Command
             #ALERT 1
             // Check if the trade is in waiting status
             if ($trade->status === "waiting") {
-                $shouldStart = ($mode === 'LONG' && $currentPrice < $entry) || ($mode !== 'LONG' && $currentPrice > $entry);
+                $shouldStart = ($mode === 'LONG' && $currentPrice < $entry) || ($mode === 'SHORT' && $currentPrice > $entry);
                 if ($shouldStart) {
-                    startWaitingTrade($trade, $chatId);
+                    startWaitingTrade($trade, $currentPrice, $chatId);
 
                     $trade->status = "running";
                     $trade->save();
@@ -219,8 +121,29 @@ class ScheduleCryptoCommand extends Command
                 if ($condition) {
                     $tpLevelStatus = "tp_" . $tp_level;
                     if ($tpLevelStatus !== $trade->last_alert) {
+                        // fix the height tp 
+                        if(formatNumberFlexible($trade->height_tp) < formatNumberFlexible($tp_level)){
+                            $trade->height_tp = $tp_level;
+                        }
                         $trade->last_alert = $tpLevelStatus;
                         $trade->save();
+
+                        // remove old message 
+                        $allTelegramMsgIds = Cache::get("signal_notification_ids_$trade->id");
+                        if (!empty($allTelegramMsgIds)) {
+                            foreach ($allTelegramMsgIds as $messageId) {
+                                try {
+                                    Telegram::deleteMessage([
+                                        'chat_id' => $chatId,
+                                        'message_id' => $messageId,
+                                    ]);
+                                } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
+                                    Log::warning("Failed to delete Telegram message ID: $messageId. Reason: " . $e->getMessage());
+                                }
+                            }
+                        }
+                        // Forget the cached message IDs after deleting
+                        Cache::forget("signal_notification_ids_$trade->id");
 
                         aiAdvisorTakeProfit($trade, $tp_level, $chatId);
                     }

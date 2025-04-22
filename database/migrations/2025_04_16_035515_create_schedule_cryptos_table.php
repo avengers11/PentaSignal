@@ -35,6 +35,7 @@ return new class extends Migration
             $table->string('specific_tp')->nullable();
             $table->string('position_size_usdt')->nullable();
             $table->string('position_size_coin')->nullable();
+            $table->string('height_tp')->nullable();
             $table->string('last_alert')->nullable();
             $table->string('status')->nullable(); 
             $table->string('type')->nullable(); 
