@@ -8,6 +8,8 @@ use App\Models\ScheduleCrypto;
 use Illuminate\Console\Command;
 use App\Jobs\ScheduleTakeLoseJob;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class ScheduleCryptoCommand extends Command
 {
@@ -21,7 +23,7 @@ class ScheduleCryptoCommand extends Command
     public function handle()
     {
         // Log::info("Cron called");
-
+        // return;
         // Get all latest running trades
         $schedules = ScheduleCrypto::latest()
         ->whereIn("status", ["running", "waiting"])
@@ -47,17 +49,14 @@ class ScheduleCryptoCommand extends Command
         $setting->value = $combainData;
         $setting->save();
 
-        // $combainData = [
-        //     "binance" => [
-        //         "LTCUSDT" => '75.9'
-        //     ],
-        //     "bybit" => [
-        //         "BTCUSDT" => '78.81'
-        //     ]
-        // ];
+        $combainData = [
+            "binance" => [
+                "LTCUSDT" => '77.9'
+            ],
+            "bybit" => []
+        ];
         // Log::info($combainData);
         
-        // return;
         // Notify users
         foreach ($schedules as $trade) {
             $instrument = str_replace('-', '', strtoupper($trade->instruments));
@@ -72,12 +71,12 @@ class ScheduleCryptoCommand extends Command
             $entry = formatNumberFlexible($trade->entry_target);
             $sl = formatNumberFlexible($trade->stop_loss);
 
+            // Log::info([
+            //     "entry" => $entry,
+            //     "sl" => $sl,
+            //     "currentPrice" => $currentPrice,
+            // ]);
 
-            Log::info([
-                "id" => $trade->id,
-                "currentP" => $currentPrice,
-                "stop" => formatNumberFlexible($trade->stop_loss),
-            ]);
 
             #ALERT 1
             // Check if the trade is in waiting status
@@ -96,9 +95,9 @@ class ScheduleCryptoCommand extends Command
             // Check SL hit
             $slHit = $mode === 'LONG' ? $currentPrice < $sl : $currentPrice > $sl;
             if ($slHit) {
-                $trade->last_alert = "sl";
-                $trade->status = "closed";
-                $trade->save();
+                // $trade->last_alert = "sl";
+                // $trade->status = "closed";
+                // $trade->save();
                 aiAdvisorTakeLose($trade, $chatId);
                 continue;
             }
@@ -121,12 +120,30 @@ class ScheduleCryptoCommand extends Command
                 if ($condition) {
                     $tpLevelStatus = "tp_" . $tp_level;
                     if ($tpLevelStatus !== $trade->last_alert) {
+                        $reserse = false;
                         // fix the height tp 
                         if(formatNumberFlexible($trade->height_tp) < formatNumberFlexible($tp_level)){
                             $trade->height_tp = $tp_level;
+                            $reserse = true;
                         }
+
+                        // last msg 
                         $trade->last_alert = $tpLevelStatus;
                         $trade->save();
+
+                        // check the trade typ and status 
+                        $isFinalTrade = false;
+                        if($trade->profit_strategy == "partial_profits"){
+                            $nextNotify = $tp_level+1;
+                            $property = 'partial_profits_tp' . $nextNotify;
+
+                            if (is_null($trade->$property) || $trade->$property === 0 || $trade->$property == "") {
+                                $trade->status = "closed";
+                                $trade->save();
+
+                                $isFinalTrade = true;
+                            }
+                        }
 
                         // remove old message 
                         $allTelegramMsgIds = Cache::get("signal_notification_ids_$trade->id");
@@ -138,14 +155,14 @@ class ScheduleCryptoCommand extends Command
                                         'message_id' => $messageId,
                                     ]);
                                 } catch (\Telegram\Bot\Exceptions\TelegramResponseException $e) {
-                                    Log::warning("Failed to delete Telegram message ID: $messageId. Reason: " . $e->getMessage());
+                                    Log::warning("Failed to delete Telegram message ID: $messageId. Reason: " . $e->getMessage() . " | Code: Cron Job");
                                 }
                             }
                         }
                         // Forget the cached message IDs after deleting
                         Cache::forget("signal_notification_ids_$trade->id");
 
-                        aiAdvisorTakeProfit($trade, $tp_level, $chatId);
+                        aiAdvisorTakeProfit($trade, $tp_level, $chatId, $reserse, $currentPrice, $isFinalTrade);
                     }
                     break;
                 }
